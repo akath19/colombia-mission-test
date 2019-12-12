@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  colombia-mission-test:
+    image: colombia-mission-test
+    build: .
+    restart: always
+    labels:
+    - "traefik.http.routers.colombia-mission.rule=PathPrefix(`/`)"
+    environment:
+    - POSTGRES_ADDR=postgres
+    - POSTGRES_PORT=5432
+    - POSTGRES_USER=mission
+    - POSTGRES_DB=colombia_mission
+    - POSTGRES_PASS=super-secret-password
+    - HTTP_PORT=8000
+    - WAIT_HOSTS=postgres:5432
+    ports:
+      - 8000:8000
+  postgres:
+    image: postgres:12-alpine
+    ports:
+    - 5432:5432
+    environment:
+    - POSTGRES_USER=mission
+    - POSTGRES_PASSWORD=super-secret-password
+    - POSTGRES_DB=colombia_mission
+    volumes:
+    - ./data:/var/lib/postgresql/data
+  traefik:
+    image: traefik:2.1
+    command: --api.insecure=true --providers.docker
+    ports:
+    - 80:80
+    - 8080:8080
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock

@@ -1,0 +1,6 @@
+#Files to ignore in container context
+.vscode/
+ansible/
+data/
+docker-compose.yml
+README.md

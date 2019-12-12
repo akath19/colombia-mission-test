@@ -1,0 +1,3 @@
+#Ignore data folder to avoid uploading DB stuff
+.vscode
+data
