@@ -1,0 +1,19 @@
+name: Docker Image CI
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Dockerhub Login
+      run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+    - name: Build image
+      run: docker build . --file Dockerfile --tag colombia-mission-test:$(date +%s)
+    - name: Push image
+      run: docker push colombia-mission-test:$(date +%s)
+      
