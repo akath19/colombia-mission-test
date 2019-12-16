@@ -14,8 +14,8 @@ jobs:
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
     - name: Build image
       id: docker-build
-      run: docker build . --file Dockerfile --tag colombia-mission-test:$(date +%s)
+      run: docker build . --file Dockerfile --tag colombia-mission-test:$(date +%F-%H-%M)
     - name: Push image
       id: docker-push
-      run: docker push colombia-mission-test:$(date +%s)
+      run: docker push colombia-mission-test:$(date +%+%F-%H-%M)
       
