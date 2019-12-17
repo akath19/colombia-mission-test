@@ -1,3 +1,4 @@
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fakath19%2Fcolombia-mission-test%2Fbadge%3Fref%3Dmaster&style=popout)](https://actions-badge.atrox.dev/akath19/colombia-mission-test/goto?ref=master)
 # Colombia Mission Technical Test
 This repo holds all files requested by the Colombia Mission Technical Operations Test
 
