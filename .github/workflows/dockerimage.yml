@@ -14,8 +14,8 @@ jobs:
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
     - name: Build image
       id: docker-build
-      run: docker build . --file Dockerfile --tag colombia-mission-test:$(echo $GITHUB_SHA)
+      run: docker build . --file Dockerfile --tag akath19/colombia-mission-test:$(echo $GITHUB_SHA)
     - name: Push image
       id: docker-push
-      run: docker push colombia-mission-test:$(echo $GITHUB_SHA)
+      run: docker push akath19/colombia-mission-test:$(echo $GITHUB_SHA)
       
