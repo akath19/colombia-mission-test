@@ -1,5 +1,0 @@
----
-- name: Debug
-  hosts: all
-  roles:
-  - angstwad.docker_ubuntu

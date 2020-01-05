@@ -18,4 +18,7 @@ jobs:
     - name: Push image
       id: docker-push
       run: docker push akath19/colombia-mission-test:$(echo $GITHUB_SHA)
+    - name: Push Latest
+      id: docker-push-latest
+      run: docker push akath19/colombia-mission-test:latest
       

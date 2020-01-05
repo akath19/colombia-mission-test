@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mission-app-config
+data:
+  postgres-addr: "127.0.0.1"
+  postgres-port: "5432"
+  postgres-user: postgres
+  postgres-pass: 9kG7LgcooqwgearE
+  postgres-db: mission_db

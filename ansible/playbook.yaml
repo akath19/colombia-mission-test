@@ -1,0 +1,83 @@
+---
+- hosts: local
+  connection: local
+  roles:
+  - role: joshbenner.kubectl
+    vars:
+      kubectl_install: no
+  tasks:
+  - name: Include Variables
+    include_vars:
+      file: vars.yaml
+  - name: Create Cluster
+    gcp_container_cluster:
+        addons_config:
+          horizontal_pod_autoscaling:
+            disabled: "{{ hpa_disabled }}"
+          http_load_balancing:
+            disabled: "{{ lb_disabled }}"
+          network_policy_config:
+            disabled: "{{ np_disabled }}"
+        name: "{{ cluster_name }}"
+        description: "{{ cluster_description }}"
+        initial_node_count: "{{ initial_node_count }}"
+        kubectl_path: "{{ kubectl_path }}"
+        location: "{{ zone }}"
+        logging_service: "{{ logging }}"
+        master_auth:
+          username: "{{ username }}"
+          password: "{{ password }}"
+        network_policy:
+          enabled: "{{ np_enabled_nodes }}"
+        project: "{{ project }}"
+        auth_kind: "{{ auth_kind }}"
+        service_account_file: "{{ service_account_file }}"
+        scopes:
+        - https://www.googleapis.com/auth/cloud-platform
+        state: present
+    register: cluster
+  - name: Node Pool Creation
+    gcp_container_node_pool:
+        auth_kind: "{{ auth_kind }}"
+        autoscaling:
+          enabled: "{{ autoscaling }}"
+          max_node_count: "{{ max_nodes }}"
+          min_node_count: "{{ min_nodes }}"
+        cluster: "{{ cluster }}"
+        name: "{{ pool_name }}"
+        config:
+          disk_size_gb: "{{ disk_size }}"
+          disk_type: "{{ disk_type }}"
+          machine_type: "{{ machine_type }}"
+        initial_node_count: "{{ initial_node_count }}"
+        location: "{{ zone }}"
+        project: "{{ project }}"
+        service_account_file: "{{ service_account_file }}"
+        scopes:
+        - https://www.googleapis.com/auth/cloud-platform
+        state: present
+  - name: Create Schema in DB
+    postgresql_db:
+        name: "{{ db_name }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+        login_host: "{{ db_ip }}"
+        state: present
+  - name: Update ConfigMap
+    kubectl_apply:
+      kubeconfig: ./kubectl
+      context: colombia-mission-test
+      namespace: default
+      file: ../k8s/configmap.yaml
+  - name: Update Secrets
+    kubectl_apply:
+      kubeconfig: ./kubectl
+      context: colombia-mission-test
+      namespace: default
+      file: ./k8s/secrets.yaml
+  - name: Update Deployment
+    kubectl_apply:
+      kubeconfig: ./kubectl
+      context: colombia-mission-test
+      namespace: default
+      file: ../k8s/deployment.yaml

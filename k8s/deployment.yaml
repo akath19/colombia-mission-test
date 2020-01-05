@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mission-app
+spec:
+  selector:
+    matchLabels:
+      app: mission-app
+  template:
+    metadata:
+      labels:
+        app: mission-app
+    spec:
+      containers:
+      - name: mission-app
+        image: akath19/colombia-mission-test:1b13b6ed6c687fdb3bbc572c9eba2ee59d8634b6
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 500m
+          limits:
+            memory: 1Gi
+            cpu: 1024m
+        env:
+        - name: POSTGRES_ADDR
+          valueFrom:
+              configMapKeyRef:
+                name: mission-app-config
+                key: postgres-addr
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mission-app-config
+              key: postgres-port
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: mission-app-config
+              key: postgres-user
+        - name: POSTGRES_PASS
+          valueFrom:
+              configMapKeyRef:
+                name: mission-app-config
+                key: postgres-pass
+        - name: POSTGRES_DB
+          valueFrom:
+              configMapKeyRef:
+                name: mission-app-config
+                key: postgres-db
+        - name: HTTP_PORT
+          value: "3000"
+        ports:
+        - name: http
+          containerPort: 3000
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.15
+        command: ["/cloud_sql_proxy", "-instances=yp-operations-test:us-central1:mission-instance=tcp:5432", "-credential_file=/secrets/cloudsql/credentials.json"]
+        securityContext:
+          runAsUser: 2
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512M
+      volumes:
+        - name: instance-credentials
+          secret:
+            secretName: instance-credentials
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mission-app
+spec:
+  selector:
+    app: mission-app
+  ports:
+  - port: 3000
+    targetPort: http
+    name: http
